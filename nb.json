@@ -1,0 +1,164 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Tingsted",
+        "description": "Adressen til Tingsted og en API-nøkkel (Mer → API og Home Assistant i Tingsted). Med skrivetilgang får du også utlånslisten, tjenestene for å legge inn og låne ut, og oppdateringer med en gang via webhook.",
+        "data": {
+          "url": "Adresse",
+          "api_key": "API-nøkkel"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Ny API-nøkkel",
+        "description": "Nøkkelen virker ikke lenger. Lim inn en ny.",
+        "data": {
+          "api_key": "API-nøkkel"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Får ikke kontakt med Tingsted på den adressen.",
+      "invalid_auth": "API-nøkkelen er feil eller slettet.",
+      "invalid_url": "Adressen må starte med http:// eller https://.",
+      "invalid_key": "En API-nøkkel starter med tsk_."
+    },
+    "abort": {
+      "already_configured": "Denne husstanden er allerede lagt til.",
+      "reauth_successful": "Ny nøkkel er lagret."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Tingsted",
+        "data": {
+          "scan_interval": "Hent på nytt hvert (sekunder)"
+        },
+        "description": "Med webhook oppdateres alt med en gang. Dette er bare en reserve."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "boxes": {
+        "name": "Kasser"
+      },
+      "items": {
+        "name": "Ting"
+      },
+      "items_total": {
+        "name": "Ting totalt"
+      },
+      "places": {
+        "name": "Steder"
+      },
+      "shelves": {
+        "name": "Hyller"
+      },
+      "lent": {
+        "name": "Utlånt"
+      },
+      "lent_overdue": {
+        "name": "Utlånt over fristen (antall)"
+      },
+      "ai_queue": {
+        "name": "AI-kø"
+      }
+    },
+    "binary_sensor": {
+      "overdue": {
+        "name": "Utlån over fristen"
+      }
+    },
+    "todo": {
+      "lent_list": {
+        "name": "Utlånsliste"
+      }
+    }
+  },
+  "services": {
+    "find": {
+      "name": "Hvor er …",
+      "description": "Finner hvor noe ligger. Gir et ferdig svar å lese opp.",
+      "fields": {
+        "query": {
+          "name": "Hva",
+          "description": "Tingen du leter etter"
+        },
+        "config_entry_id": {
+          "name": "Husstand",
+          "description": "Hvis du har flere"
+        }
+      }
+    },
+    "search": {
+      "name": "Søk",
+      "description": "Søker etter ting, kasser og hyller.",
+      "fields": {
+        "query": {
+          "name": "Søk",
+          "description": "Søkeord"
+        },
+        "config_entry_id": {
+          "name": "Husstand",
+          "description": "Hvis du har flere"
+        }
+      }
+    },
+    "add_items": {
+      "name": "Legg i kasse",
+      "description": "Legger ting i en kasse. «hammer x2» gir antall 2.",
+      "fields": {
+        "box": {
+          "name": "Kasse",
+          "description": "Kassekode, f.eks. B3"
+        },
+        "items": {
+          "name": "Ting",
+          "description": "Én eller flere"
+        },
+        "config_entry_id": {
+          "name": "Husstand",
+          "description": "Hvis du har flere"
+        }
+      }
+    },
+    "lend": {
+      "name": "Lån ut",
+      "description": "Merker en ting som lånt ut.",
+      "fields": {
+        "item_id": {
+          "name": "Ting-id",
+          "description": "Id-en til tingen"
+        },
+        "to": {
+          "name": "Til",
+          "description": "Hvem som låner"
+        },
+        "due": {
+          "name": "Tilbake innen",
+          "description": "Valgfri frist"
+        },
+        "config_entry_id": {
+          "name": "Husstand",
+          "description": "Hvis du har flere"
+        }
+      }
+    },
+    "return_item": {
+      "name": "Levert tilbake",
+      "description": "Merker en utlånt ting som levert tilbake.",
+      "fields": {
+        "item_id": {
+          "name": "Ting-id",
+          "description": "Id-en til tingen"
+        },
+        "config_entry_id": {
+          "name": "Husstand",
+          "description": "Hvis du har flere"
+        }
+      }
+    }
+  }
+}

@@ -64,6 +64,15 @@
       },
       "ai_queue": {
         "name": "AI queue"
+      },
+      "total_value": {
+        "name": "Total value"
+      },
+      "search_result": {
+        "name": "Search answer"
+      },
+      "last_event": {
+        "name": "Last event"
       }
     },
     "binary_sensor": {
@@ -74,6 +83,21 @@
     "todo": {
       "lent_list": {
         "name": "Loan list"
+      }
+    },
+    "text": {
+      "search": {
+        "name": "Search"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Refresh"
+      }
+    },
+    "calendar": {
+      "calendar": {
+        "name": "Tingsted"
       }
     }
   },
@@ -153,6 +177,20 @@
         "item_id": {
           "name": "Item id",
           "description": "The item's id"
+        },
+        "config_entry_id": {
+          "name": "Household",
+          "description": "If you have several"
+        }
+      }
+    },
+    "recent": {
+      "name": "Recent changes",
+      "description": "The latest changes in Tingsted (who did what).",
+      "fields": {
+        "limit": {
+          "name": "Count",
+          "description": "How many"
         },
         "config_entry_id": {
           "name": "Household",

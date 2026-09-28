@@ -6,22 +6,7 @@ from homeassistant.core import callback
 from homeassistant.helpers import entity_registry as er
 
 from .const import DOMAIN, EVENT
-
-
-def _text(d: dict) -> str:
-    ev, name, box = d.get("event", ""), d.get("name") or "", d.get("box") or d.get("code") or ""
-    return {
-        "item.added": f"la til «{name}»" + (f" i {box}" if box else ""),
-        "item.updated": f"endret «{name}»",
-        "item.deleted": f"fjernet «{name}»",
-        "item.lent": f"lånte ut «{name}» til {d.get('lent_to', '')}",
-        "item.returned": f"fikk «{name}» tilbake fra {d.get('lent_to', '')}",
-        "box.created": f"laget kasse {d.get('path') or box}",
-        "box.moved": f"flyttet {d.get('code', '')} til {d.get('new', '')}",
-        "box.deleted": f"slettet kasse {d.get('path') or box}",
-        "ai.done": f"AI-forslag er klare ({d.get('items', 0)} ting)",
-        "test": "testmelding fra Tingsted",
-    }.get(ev, ev)
+from .helpers import event_text as _text
 
 
 @callback

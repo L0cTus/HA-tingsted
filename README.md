@@ -17,6 +17,34 @@ Kobler Home Assistant til [Tingsted](../README.md), den selvhostede oversikten o
   Da fyres `tingsted_event` (alle hendelser) og for eksempel `tingsted_item_lent`, `tingsted_item_added` og
   `tingsted_box_moved` i HA, og sensorene oppdateres med en gang.
 
+## Tingsted-kortet
+
+Integrasjonen har med et eget dashbordkort. Du trenger ikke legge til noen ressurs, det lastes av seg selv.
+Rediger et dashbord → Legg til kort → søk etter «Tingsted», eller lim inn:
+
+```yaml
+type: custom:tingsted-card
+```
+
+Kortet har søk med ferdig svar og treffliste, knappene «Lån ut» og «Levert» og «Åpne i Tingsted», utlånt med frist,
+«Legg i kasse» og siste endringer (hvem gjorde hva). Valg:
+
+```yaml
+type: custom:tingsted-card
+title: Boden
+sections: [search, lent, add, recent]   # velg hvilke deler som vises
+recent_limit: 8
+config_entry_id: ...                    # bare hvis du har flere husstander
+```
+
+Uten kortet finnes også:
+
+- **Søk** (tekstfelt) og **Søkesvar** (sensor): skriv noe i søkefeltet, så viser søkesvaret hvor det ligger. Alle treffene ligger som attributter.
+- **Siste hendelse**: det siste som skjedde i Tingsted.
+- **Samlet verdi**: summen av det som er registrert med verdi, i kroner.
+- **Kalender**: frister for utlån og når garantier går ut.
+- **Oppdater nå** (knapp).
+
 ## Installere
 
 **HACS:** legg denne mappa i et eget GitHub-repo, og legg til repoet i HACS som «Custom repository» (type: Integration).

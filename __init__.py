@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import timedelta
+from pathlib import Path
 
 import voluptuous as vol
 from homeassistant.components import webhook
@@ -14,14 +15,18 @@ from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady,
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import intent
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import TingstedAuthError, TingstedClient, TingstedError, verify_signature
 from .const import CONF_KEY, CONF_SCAN, CONF_URL, DEFAULT_SCAN, DOMAIN, EVENT
+from .helpers import SIGNAL_EVENT, event_text
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.TODO]
+PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.TODO, Platform.TEXT, Platform.BUTTON, Platform.CALENDAR]
+CARD_URL = "/tingsted_static"
+CARD_VERSION = "0.3.0"
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
@@ -30,6 +35,8 @@ class TingstedData:
     client: TingstedClient
     coordinator: "TingstedCoordinator"
     info: dict
+    search: dict = field(default_factory=dict)       # siste søk fra søkefeltet
+    last_event: dict = field(default_factory=dict)   # siste hendelse fra webhooken
 
     @property
     def can_write(self) -> bool:
@@ -49,7 +56,12 @@ class TingstedCoordinator(DataUpdateCoordinator[dict]):
 
     async def _async_update_data(self) -> dict:
         try:
-            return {"stats": await self.client.stats(), "lent": await self.client.lent()}
+            data = {"stats": await self.client.stats(), "lent": await self.client.lent()}
+            try:
+                data["values"] = await self.client.values()
+            except TingstedError:
+                data["values"] = {}          # eldre Tingsted uten /values
+            return data
         except TingstedAuthError as e:
             raise ConfigEntryAuthFailed(str(e)) from e
         except TingstedError as e:
@@ -60,7 +72,20 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Tjenester og «Hvor er …?» registreres én gang, uansett hvor mange husstander som er koblet til."""
     _register_services(hass)
     intent.async_register(hass, FindIntent())
+    await _register_card(hass)
     return True
+
+
+async def _register_card(hass: HomeAssistant) -> None:
+    """Gjør «custom:tingsted-card» tilgjengelig i dashbordene, uten at du må legge til en ressurs selv."""
+    try:
+        from homeassistant.components.frontend import add_extra_js_url
+        from homeassistant.components.http import StaticPathConfig
+        await hass.http.async_register_static_paths(
+            [StaticPathConfig(CARD_URL, str(Path(__file__).parent / "www"), False)])
+        add_extra_js_url(hass, f"{CARD_URL}/tingsted-card.js?v={CARD_VERSION}")
+    except Exception as e:  # kortet er et tillegg; integrasjonen virker uten
+        _LOGGER.warning("Tingsted: kunne ikke registrere kortet: %s", e)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: TingstedConfigEntry) -> bool:
@@ -137,6 +162,9 @@ def _make_handler(entry: TingstedConfigEntry):
         name = str(payload.get("event", ""))
         data = {"event": name, "household": entry.title, "config_entry_id": entry.entry_id, **(payload.get("data") or {})}
         hass.bus.async_fire(EVENT, data)
+        if name != "test":
+            entry.runtime_data.last_event = {**data, "text": event_text(data)}
+            async_dispatcher_send(hass, SIGNAL_EVENT.format(entry.entry_id))
         if name and name != "test":
             hass.bus.async_fire(f"{DOMAIN}_{name.replace('.', '_')}", data)
         await entry.runtime_data.coordinator.async_request_refresh()
@@ -169,6 +197,13 @@ def _register_services(hass: HomeAssistant) -> None:
         e = _entry(hass, call.data.get("config_entry_id"))
         try:
             return await e.runtime_data.client.search(call.data["query"])
+        except TingstedError as err:
+            raise HomeAssistantError(str(err)) from err
+
+    async def recent(call: ServiceCall) -> ServiceResponse:
+        e = _entry(hass, call.data.get("config_entry_id"))
+        try:
+            return await e.runtime_data.client.history(int(call.data.get("limit", 15)))
         except TingstedError as err:
             raise HomeAssistantError(str(err)) from err
 
@@ -206,6 +241,8 @@ def _register_services(hass: HomeAssistant) -> None:
     hass.services.async_register(DOMAIN, "find", find, vol.Schema({vol.Required("query"): cv.string, entry_field: cv.string}),
                                  supports_response=SupportsResponse.ONLY)
     hass.services.async_register(DOMAIN, "search", search, vol.Schema({vol.Required("query"): cv.string, entry_field: cv.string}),
+                                 supports_response=SupportsResponse.ONLY)
+    hass.services.async_register(DOMAIN, "recent", recent, vol.Schema({vol.Optional("limit"): vol.Coerce(int), entry_field: cv.string}),
                                  supports_response=SupportsResponse.ONLY)
     hass.services.async_register(DOMAIN, "add_items", add_items, vol.Schema({
         vol.Required("box"): cv.string, vol.Required("items"): vol.Any(cv.string, [cv.string]), entry_field: cv.string}),

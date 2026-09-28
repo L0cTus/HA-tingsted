@@ -1,0 +1,164 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Tingsted",
+        "description": "The address of Tingsted and an API key (More → API og Home Assistant in Tingsted). A key with write access also enables the loan list, services and instant updates via webhook.",
+        "data": {
+          "url": "URL",
+          "api_key": "API key"
+        }
+      },
+      "reauth_confirm": {
+        "title": "New API key",
+        "description": "The key no longer works. Paste a new one.",
+        "data": {
+          "api_key": "API key"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot reach Tingsted at that address.",
+      "invalid_auth": "The API key is wrong or revoked.",
+      "invalid_url": "The URL must start with http:// or https://.",
+      "invalid_key": "An API key starts with tsk_."
+    },
+    "abort": {
+      "already_configured": "This household is already added.",
+      "reauth_successful": "The new key is saved."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Tingsted",
+        "data": {
+          "scan_interval": "Update interval (seconds)"
+        },
+        "description": "With the webhook everything updates instantly. This is only a fallback."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "boxes": {
+        "name": "Boxes"
+      },
+      "items": {
+        "name": "Items"
+      },
+      "items_total": {
+        "name": "Items total"
+      },
+      "places": {
+        "name": "Places"
+      },
+      "shelves": {
+        "name": "Shelves"
+      },
+      "lent": {
+        "name": "Lent out"
+      },
+      "lent_overdue": {
+        "name": "Overdue loans"
+      },
+      "ai_queue": {
+        "name": "AI queue"
+      }
+    },
+    "binary_sensor": {
+      "overdue": {
+        "name": "Overdue loan"
+      }
+    },
+    "todo": {
+      "lent_list": {
+        "name": "Lent out"
+      }
+    }
+  },
+  "services": {
+    "find": {
+      "name": "Find item",
+      "description": "Finds where something is stored. Returns a ready-made answer.",
+      "fields": {
+        "query": {
+          "name": "What",
+          "description": "The item to look for"
+        },
+        "config_entry_id": {
+          "name": "Household",
+          "description": "If you have several"
+        }
+      }
+    },
+    "search": {
+      "name": "Search",
+      "description": "Searches items, boxes and shelves.",
+      "fields": {
+        "query": {
+          "name": "Query",
+          "description": "Search words"
+        },
+        "config_entry_id": {
+          "name": "Household",
+          "description": "If you have several"
+        }
+      }
+    },
+    "add_items": {
+      "name": "Add items",
+      "description": "Adds items to a box. 'hammer x2' sets quantity 2.",
+      "fields": {
+        "box": {
+          "name": "Box",
+          "description": "Box code, e.g. B3"
+        },
+        "items": {
+          "name": "Items",
+          "description": "One or more"
+        },
+        "config_entry_id": {
+          "name": "Household",
+          "description": "If you have several"
+        }
+      }
+    },
+    "lend": {
+      "name": "Lend",
+      "description": "Marks an item as lent out.",
+      "fields": {
+        "item_id": {
+          "name": "Item id",
+          "description": "The item's id"
+        },
+        "to": {
+          "name": "To",
+          "description": "Who borrows it"
+        },
+        "due": {
+          "name": "Due",
+          "description": "Optional due date"
+        },
+        "config_entry_id": {
+          "name": "Household",
+          "description": "If you have several"
+        }
+      }
+    },
+    "return_item": {
+      "name": "Returned",
+      "description": "Marks a lent item as returned.",
+      "fields": {
+        "item_id": {
+          "name": "Item id",
+          "description": "The item's id"
+        },
+        "config_entry_id": {
+          "name": "Household",
+          "description": "If you have several"
+        }
+      }
+    }
+  }
+}

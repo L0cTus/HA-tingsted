@@ -60,20 +60,44 @@
         "name": "Utlånt"
       },
       "lent_overdue": {
-        "name": "Utlånt over fristen"
+        "name": "Utlånt over fristen (antall)"
       },
       "ai_queue": {
         "name": "AI-kø"
+      },
+      "total_value": {
+        "name": "Samlet verdi"
+      },
+      "search_result": {
+        "name": "Søkesvar"
+      },
+      "last_event": {
+        "name": "Siste hendelse"
       }
     },
     "binary_sensor": {
       "overdue": {
-        "name": "Noe er ikke levert tilbake"
+        "name": "Utlån over fristen"
       }
     },
     "todo": {
       "lent_list": {
-        "name": "Utlånt"
+        "name": "Utlånsliste"
+      }
+    },
+    "text": {
+      "search": {
+        "name": "Søk"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Oppdater nå"
+      }
+    },
+    "calendar": {
+      "calendar": {
+        "name": "Tingsted"
       }
     }
   },
@@ -153,6 +177,20 @@
         "item_id": {
           "name": "Ting-id",
           "description": "Id-en til tingen"
+        },
+        "config_entry_id": {
+          "name": "Husstand",
+          "description": "Hvis du har flere"
+        }
+      }
+    },
+    "recent": {
+      "name": "Siste endringer",
+      "description": "De siste endringene i Tingsted (hvem gjorde hva).",
+      "fields": {
+        "limit": {
+          "name": "Antall",
+          "description": "Hvor mange"
         },
         "config_entry_id": {
           "name": "Husstand",

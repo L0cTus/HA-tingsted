@@ -82,6 +82,12 @@ class TingstedClient:
     async def search(self, q: str) -> dict:
         return await self._call("GET", "/search", params={"q": q})
 
+    async def history(self, limit: int = 20) -> dict:
+        return await self._call("GET", "/history", params={"limit": limit})
+
+    async def values(self) -> dict:
+        return await self._call("GET", "/values")
+
     async def box(self, ref: str) -> dict:
         return await self._call("GET", f"/boxes/{ref}")
 
